@@ -1,0 +1,11 @@
+Pasos para crear python environment:
+
+1. Crear un entorno virtual: python -m venv venv
+
+2. Activar el entorno virtual: venv\Scripts\activate
+
+3. Instalar las dependencias: pip install flask pymongo python-dotenv flask-cors
+
+4. Si te tira error corre este comando: pip list | findstr flask-pymongo
+
+5. Para correr la aplicacion: python app.py
