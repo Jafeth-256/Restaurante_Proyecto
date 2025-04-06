@@ -1,6 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash
 from bson.objectid import ObjectId
 from config import app, mongo
+from flask import send_from_directory
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
 
 @app.route('/')
 def home():
@@ -8,7 +13,7 @@ def home():
 
 @app.route('/<collection>')
 def index(collection):
-    if collection not in ["empleados", "clientes", "bebidas", "platos", "proveedores", "pedidos"]:
+    if collection not in ["empleados", "clientes", "bebidas", "platos", "proveedores", "pedidos", "inventario", "reservaciones"]:
         return redirect(url_for('home'))
 
     documentos = mongo.db[collection].find()
@@ -54,7 +59,6 @@ def add_document(collection):
             'direccion': request.form['direccion']
         }
     elif collection == "pedidos":
-        # Para pedidos, necesitamos manejar la relación con clientes y platos
         cliente_id = request.form['cliente_id']
         plato_id = request.form['plato_id']
         cantidad = int(request.form['cantidad'])
@@ -68,6 +72,21 @@ def add_document(collection):
                 }
             ],
             'fecha': request.form['fecha'],
+            'estado': request.form['estado']
+        }
+    elif collection == "inventario":
+        data = {
+            'producto': request.form['producto'],
+            'cantidad': int(request.form['cantidad']),
+            'unidad': request.form['unidad'],
+            'proveedor': request.form['proveedor']
+        }
+    elif collection == "reservaciones":
+        data = {
+            'cliente': request.form['cliente'],
+            'mesa': int(request.form['mesa']),
+            'fecha': request.form['fecha'],
+            'hora': request.form['hora'],
             'estado': request.form['estado']
         }
 
@@ -131,6 +150,21 @@ def edit_document(collection, id):
                     }
                 ],
                 'fecha': request.form['fecha'],
+                'estado': request.form['estado']
+            }
+        elif collection == "inventario":
+            data = {
+                'producto': request.form['producto'],
+                'cantidad': int(request.form['cantidad']),
+                'unidad': request.form['unidad'],
+                'proveedor': request.form['proveedor']
+            }
+        elif collection == "reservaciones":
+            data = {
+                'cliente': request.form['cliente'],
+                'mesa': int(request.form['mesa']),
+                'fecha': request.form['fecha'],
+                'hora': request.form['hora'],
                 'estado': request.form['estado']
             }
 
