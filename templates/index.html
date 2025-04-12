@@ -363,6 +363,45 @@
                                     <option value="Cancelada">Cancelada</option>
                                 </select>
                             </div>
+                            {% elif collection == 'mesas' %}
+                            <div class="col-md-4">
+                                <input type="number" name="numero" class="form-control" placeholder="Número" required>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" name="capacidad" class="form-control" placeholder="Capacidad" required>
+                            </div>
+                            <div class="col-md-4">
+                                <select name="ocupada" class="form-select" required>
+                                    <option value="">Seleccionar Estado</option>
+                                    <option value="true">Ocupada</option>
+                                    <option value="false">Disponible</option>
+                                </select>
+                            </div>
+                            {% elif collection == 'pagos' %}
+                            <div class="col-md-3">
+                                <input type="text" name="cliente" class="form-control" placeholder="Cliente" required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" name="monto" class="form-control" placeholder="Monto" required>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="metodo" class="form-select" required>
+                                    <option value="">Seleccionar Método</option>
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Tarjeta de crédito">Tarjeta de crédito</option>
+                                    <option value="Tarjeta de débito">Tarjeta de débito</option>
+                                    <option value="PayPal">PayPal</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="estado" class="form-select" required>
+                                    <option value="">Seleccionar Estado</option>
+                                    <option value="Aprobado">Aprobado</option>
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Rechazado">Rechazado</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                </select>
+                            </div>
                             {% endif %}
                         </div>
                         <div class="row mt-4">
@@ -422,6 +461,15 @@
                                 <th>Mesa</th>
                                 <th>Fecha</th>
                                 <th>Hora</th>
+                                <th>Estado</th>
+                                {% elif collection == 'mesas' %}
+                                <th>Número</th>
+                                <th>Capacidad</th>
+                                <th>Estado</th>
+                                {% elif collection == 'pagos' %}
+                                <th>Cliente</th>
+                                <th>Monto</th>
+                                <th>Método</th>
                                 <th>Estado</th>
                                 {% endif %}
                                 <th>Acciones</th>
@@ -496,6 +544,31 @@
                                             {% if documento.estado == 'Pendiente' %}badge-pendiente
                                             {% elif documento.estado == 'Confirmada' %}badge-confirmada
                                             {% elif documento.estado == 'Cancelada' %}badge-cancelado
+                                            {% endif %}">
+                                        {{ documento.estado }}
+                                    </span>
+                                </td>
+                                {% elif collection == 'mesas' %}
+                                <td>{{ documento.numero }}</td>
+                                <td>{{ documento.capacidad }}</td>
+                                <td>
+                                    <span class="badge-status 
+                                            {% if documento.ocupada %}badge-enproceso
+                                            {% else %}badge-completado
+                                            {% endif %}">
+                                        {{ "Ocupada" if documento.ocupada else "Disponible" }}
+                                    </span>
+                                </td>
+                                {% elif collection == 'pagos' %}
+                                <td>{{ documento.cliente }}</td>
+                                <td>₡{{ "{:,.0f}".format(documento.monto) }}</td>
+                                <td>{{ documento.metodo }}</td>
+                                <td>
+                                    <span class="badge-status 
+                                            {% if documento.estado == 'Pendiente' %}badge-pendiente
+                                            {% elif documento.estado == 'Aprobado' %}badge-aprobado
+                                            {% elif documento.estado == 'Rechazado' %}badge-rechazado
+                                            {% elif documento.estado == 'Cancelado' %}badge-cancelado
                                             {% endif %}">
                                         {{ documento.estado }}
                                     </span>

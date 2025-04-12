@@ -141,6 +141,9 @@
         .btn-pedidos { background-color: #dc3545; color: white; border: 2px solid #dc3545; }
         .btn-inventario { background-color: #343a40; color: white; border: 2px solid #343a40; }
         .btn-reservaciones { background-color: #17a2b8; color: white; border: 2px solid #17a2b8; }
+        .btn-pagos {background-color: #9c27b0; color: white; border: 2px solid #9c27b0; }
+        .btn-mesas {background-color: #795548; color: white; border: 2px solid #795548; }
+
 
         .section-title {
             color: var(--azul);
@@ -212,6 +215,16 @@
                     <div class="col-md-4 col-lg-3">
                         <a href="{{ url_for('index', collection='reservaciones') }}" class="btn btn-menu btn-reservaciones">
                             <i class="fas fa-calendar-alt me-2"></i>Reservaciones
+                        </a>
+                    </div>
+                    <div class="col-md-4 col-lg-3">
+                        <a href="{{ url_for('index', collection='pagos') }}" class="btn btn-menu btn-pagos">
+                            <i class="fas fa-credit-card me-2"></i>Pagos
+                        </a>
+                    </div>
+                    <div class="col-md-4 col-lg-3">
+                        <a href="{{ url_for('index', collection='mesas') }}" class="btn btn-menu btn-mesas">
+                            <i class="fas fa-chair me-2"></i>Mesas
                         </a>
                     </div>
                 </div>
