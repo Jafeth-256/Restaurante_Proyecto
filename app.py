@@ -13,7 +13,7 @@ def home():
 
 @app.route('/<collection>')
 def index(collection):
-    if collection not in ["empleados", "clientes", "bebidas", "platos", "proveedores", "pedidos", "inventario", "reservaciones"]:
+    if collection not in ["empleados", "clientes", "bebidas", "platos", "proveedores", "pedidos", "inventario", "reservaciones", "pagos", "mesas"]:
         return redirect(url_for('home'))
 
     documentos = mongo.db[collection].find()
@@ -88,6 +88,19 @@ def add_document(collection):
             'fecha': request.form['fecha'],
             'hora': request.form['hora'],
             'estado': request.form['estado']
+        }
+    elif collection == "pagos":
+        data = {
+            'cliente': request.form['cliente'],
+            'monto': int(request.form['monto']),
+            'metodo': request.form['metodo'],
+            'estado': request.form['estado']
+        }
+    elif collection == "mesas":
+        data = {
+            'numero': int(request.form['numero']),
+            'capacidad': int(request.form['capacidad']),
+            'ocupada': request.form['ocupada'] == 'true'
         }
 
     mongo.db[collection].insert_one(data)
@@ -166,6 +179,19 @@ def edit_document(collection, id):
                 'fecha': request.form['fecha'],
                 'hora': request.form['hora'],
                 'estado': request.form['estado']
+            }
+        elif collection == "pagos":
+            data = {
+                'cliente': request.form['cliente'],
+                'monto': int(request.form['monto']),
+                'metodo': request.form['metodo'],
+                'estado': request.form['estado']
+            }
+        elif collection == "mesas":
+            data = {
+                'numero': int(request.form['numero']),
+                'capacidad': int(request.form['capacidad']),
+                'ocupada': request.form['ocupada'] == 'true'
             }
 
         mongo.db[collection].update_one({"_id": ObjectId(id)}, {"$set": data})
