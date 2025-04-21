@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de {{ collection.capitalize() }} - La Duquesa{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold">Gestión de {{ collection.capitalize() }}</h1>
+    <a href="{{ url_for('add', collection=collection) }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Agregar {{ collection[:-1] }}
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        {% if collection == 'bebidas' %}
+                        <th>Imagen</th>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Descripción</th>
+                        <th>Categoría</th>
+                        <th>Stock</th>
+                        <th>Proveedor ID</th>
+                        <th>Estado</th>
+                        {% elif collection == 'usuarios' %}
+                        <th>Nombre de usuario</th>
+                        <th>Nombre completo</th>
+                        <th>Rol</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        {% elif collection == 'platos' %}
+                        <th>Imagen</th>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Descripción</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        {% elif collection == 'proveedores' %}
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Contacto</th>
+                        <th>Teléfono</th>
+                        <th>Producto</th>
+                        <th>Email</th>
+                        <th>Dirección</th>
+                        <th>Estado</th>
+                        {% elif collection == 'pedidos' %}
+                        <th>ID</th>
+                        <th>Usuario ID</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Método Pago</th>
+                        <th>Estado Pago</th>
+                        {% elif collection == 'inventario' %}
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Proveedor</th>
+                        <th>Proveedor ID</th>
+                        <th>Ubicación</th>
+                        <th>Mínimo Stock</th>
+                        {% elif collection == 'reservaciones' %}
+                        <th>ID</th>
+                        <th>Usuario ID</th>
+                        <th>Mesa</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Personas</th>
+                        <th>Estado</th>
+                        <th>Empleado ID</th>
+                        {% elif collection == 'pagos' %}
+                        <th>ID</th>
+                        <th>Usuario ID</th>
+                        <th>Pedido ID</th>
+                        <th>Monto</th>
+                        <th>Método</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        {% elif collection == 'mesas' %}
+                        <th>ID</th>
+                        <th>Número</th>
+                        <th>Capacidad</th>
+                        <th>Ubicación</th>
+                        <th>Estado</th>
+                        {% endif %}
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for documento in documentos %}
+                    <tr>
+                        {% if collection == 'bebidas' %}
+                        <td>
+                            <img src="{{ url_for('static', filename='images/' + (documento.imagen if documento.imagen else 'default.jpg')) }}" 
+                                class="img-thumbnail" style="max-width: 60px;">
+                        </td>
+                        <td class="text-muted">{{ documento._id|truncate(8, True, '') }}</td>
+                        <td>{{ documento.nombre }}</td>
+                        <td>₡{{ "{:,.0f}".format(documento.precio) }}</td>
+                        <td>{{ documento.descripcion|truncate(30) }}</td>
+                        <td>{{ documento.categoria }}</td>
+                        <td>{{ documento.stock }}</td>
+                        <td>{{ documento.proveedor_id|string|truncate(8, True, '') if documento.proveedor_id else 'N/A' }}</td>
+                        <td>
+                            <span class="badge {% if documento.activo %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ "Activo" if documento.activo else "Inactivo" }}
+                            </span>
+                        </td>
+                        {% elif collection == 'usuarios' %}
+                        <td>{{ documento.username }}</td>
+                        <td>{{ documento.nombre_completo }}</td>
+                        <td>{{ documento.rol.capitalize() }}</td>
+                        <td>{{ documento.email }}</td>
+                        <td>{{ documento.telefono }}</td>
+                        <td>
+                            <span class="badge {% if documento.activo %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ "Activo" if documento.activo else "Inactivo" }}
+                            </span>
+                        </td>
+                        {% elif collection == 'platos' %}
+                        <td>
+                            <img src="{{ url_for('static', filename='images/' + (documento.imagen if documento.imagen else 'default.jpg')) }}" 
+                                class="img-thumbnail" style="max-width: 60px;">
+                        </td>
+                        <td class="text-muted">{{ documento._id|truncate(8, True, '') }}</td>
+                        <td>{{ documento.nombre }}</td>
+                        <td>₡{{ "{:,.0f}".format(documento.precio) }}</td>
+                        <td>{{ documento.descripcion|truncate(30) }}</td>
+                        <td>{{ documento.categoria }}</td>
+                        <td>
+                            <span class="badge {% if documento.activo %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ "Activo" if documento.activo else "Inactivo" }}
+                            </span>
+                        </td>
+                        {% elif collection == 'proveedores' %}
+                        <td class="text-muted">{{ documento._id|truncate(8, True, '') }}</td>
+                        <td>{{ documento.nombre }}</td>
+                        <td>{{ documento.contacto }}</td>
+                        <td>{{ documento.telefono }}</td>
+                        <td>{{ documento.producto|truncate(30) }}</td>
+                        <td>{{ documento.email }}</td>
+                        <td>{{ documento.direccion|truncate(20) }}</td>
+                        <td>
+                            <span class="badge {% if documento.activo %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ "Activo" if documento.activo else "Inactivo" }}
+                            </span>
+                        </td>
+                        {% elif collection == 'pedidos' %}
+                        <td class="text-muted">{{ documento._id }}</td>
+                        <td class="text-muted">{{ documento.usuario_id }}</td>
+                        <td>{{ documento.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>₡{{ "{:,.0f}".format(documento.total) }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if documento.estado == 'Pendiente' %}bg-pendiente
+                                {% elif documento.estado == 'pendiente' %}bg-pendiente
+                                {% elif documento.estado == 'En proceso' %}bg-proceso
+                                {% elif documento.estado == 'en proceso' %}bg-proceso
+                                {% elif documento.estado == 'entregado' %}bg-completado
+                                {% elif documento.estado == 'entregado' %}bg-completado
+                                {% elif documento.estado == 'Completado' %}bg-completado
+                                {% elif documento.estado == 'completado' %}bg-completado
+                                {% elif documento.estado == 'cancelado' %}bg-cancelado
+                                {% elif documento.estado == 'Cancelado' %}bg-cancelado
+                                {% endif %}">
+                                {{ documento.estado }}
+                            </span>
+                        </td>
+                        <td>{{ documento.metodo_pago|capitalize }}</td>
+                        <td>{{ documento.estado_pago|capitalize }}</td>
+                        {% elif collection == 'inventario' %}
+                        <td class="text-muted">{{ documento._id|truncate(8, True, '') }}</td>
+                        <td>{{ documento.producto }}</td>
+                        <td>{{ documento.cantidad }}</td>
+                        <td>{{ documento.unidad }}</td>
+                        <td>{{ documento.proveedor|truncate(20) }}</td>
+                        <td class="text-muted">{{ documento.proveedor_id|string|truncate(8, True, '') if documento.proveedor_id else 'N/A' }}</td>
+                        <td>{{ documento.ubicacion }}</td>
+                        <td>{{ documento.minimo_stock }}</td>
+                        {% elif collection == 'reservaciones' %}
+                        <td class="text-muted">{{ documento._id }}</td>
+                        <td class="text-muted">{{ documento.usuario_id }}</td>
+                        <td>{{ documento.mesa }}</td>
+                        <td>{{ documento.fecha.strftime('%d/%m/%Y') if documento.fecha else 'N/A' }}</td>
+                        <td>{{ documento.hora }}</td>
+                        <td>{{ documento.personas }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if documento.estado == 'pendiente' %}bg-pendiente
+                                {% elif documento.estado == 'confirmada' %}bg-completado
+                                {% elif documento.estado == 'cancelada' %}bg-cancelado
+                                {% endif %}">
+                                {{ documento.estado|capitalize }}
+                            </span>
+                        </td>
+                        <td class="text-muted">{{ documento.empleado_id|string|truncate(8, True, '') if documento.empleado_id else 'N/A' }}</td>
+                        {% elif collection == 'pagos' %}
+                        <td class="text-muted">{{ documento._id }}</td>
+                        <td class="text-muted">{{ documento.usuario_id }}</td>
+                        <td class="text-muted">{{ documento.pedido_id }}</td>
+                        <td>₡{{ "{:,.0f}".format(documento.monto) }}</td>
+                        <td>{{ documento.metodo|capitalize }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if documento.estado == 'aprobado' %}bg-completado
+                                {% elif documento.estado == 'pendiente' %}bg-pendiente
+                                {% elif documento.estado == 'rechazado' %}bg-cancelado
+                                {% elif documento.estado == 'reembolsado' %}bg-cancelado
+                                {% endif %}">
+                                {{ documento.estado|capitalize }}
+                            </span>
+                        </td>
+                        <td>{{ documento.fecha.strftime('%d/%m/%Y %H:%M') if documento.fecha else 'N/A' }}</td>
+                        {% elif collection == 'mesas' %}
+                        <td class="text-muted">{{ documento._id|truncate(8, True, '') }}</td>
+                        <td>{{ documento.numero }}</td>
+                        <td>{{ documento.capacidad }}</td>
+                        <td>{{ documento.ubicacion }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if documento.ocupada %}bg-proceso
+                                {% else %}bg-completado
+                                {% endif %}">
+                                {{ "Ocupada" if documento.ocupada else "Disponible" }}
+                            </span>
+                        </td>
+                        <td>{{ documento.caracteristicas|join(', ')|truncate(30) if documento.caracteristicas else 'N/A' }}</td>
+                        {% endif %}
+                        <td>
+                            <div class="d-flex">
+                                <a href="{{ url_for('edit', collection=collection, id=documento._id) }}"
+                                    class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url_for('delete', collection=collection, id=documento._id) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('¿Está seguro que desea eliminar este registro?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

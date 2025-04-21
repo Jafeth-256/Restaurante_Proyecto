@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Pedidos - Restaurante La Duquesa{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold">Mis Pedidos</h1>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('realizar_pedido') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Nuevo Pedido
+    </a>
+    {% endif %}
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if not pedidos %}
+        <div class="alert alert-info">
+            No hay pedidos registrados.
+        </div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                    <tr>
+                        <td>{{ pedido['_id'] }}</td>
+                        <td>{{ pedido['fecha'].strftime('%d/%m/%Y %H:%M') if pedido['fecha'] else 'N/A' }}</td>
+                        <td>
+                            <ul class="list-unstyled mb-0">
+                                {% for item in pedido.get('items', []) %}
+                                <li>{{ item.get('nombre', 'Producto no disponible') }} (x{{ item.get('cantidad', 0) }})
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>₡{{ "{:,.0f}".format(pedido.get('total', 0)) }}</td>
+                        <td>
+                            <span class="badge badge-estado 
+                                {% if pedido.get('estado') == 'Pendiente' %}bg-pendiente
+                                {% elif pedido.get('estado') == 'En proceso' %}bg-proceso
+                                {% elif pedido.get('estado') == 'Completado' %}bg-completado
+                                {% elif pedido.get('estado') == 'Cancelado' %}bg-cancelado
+                                {% endif %}">
+                                {{ pedido.get('estado', 'Desconocido') }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex">
+                                <a href="#" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal"
+                                    data-bs-target="#detallePedido{{ pedido['_id'] }}">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if pedido.get('estado') == 'Pendiente' %}
+                                <form action="{{ url_for('cancelar_pedido', id=pedido['_id']) }}" method="POST"
+                                    onsubmit="return confirm('¿Está seguro que desea cancelar este pedido?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% for pedido in pedidos %}
+<div class="modal fade" id="detallePedido{{ pedido['_id'] }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalle del Pedido #{{ pedido['_id'] }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6>Información del Pedido</h6>
+                        <p><strong>Fecha:</strong> {{ pedido.get('fecha').strftime('%d/%m/%Y %H:%M') if
+                            pedido.get('fecha') else 'N/A' }}</p>
+                        <p><strong>Estado:</strong>
+                            <span class="badge badge-estado 
+                                {% if pedido.get('estado') == 'Pendiente' %}bg-pendiente
+                                {% elif pedido.get('estado') == 'En proceso' %}bg-proceso
+                                {% elif pedido.get('estado') == 'Completado' %}bg-completado
+                                {% elif pedido.get('estado') == 'Cancelado' %}bg-cancelado
+                                {% endif %}">
+                                {{ pedido.get('estado', 'Desconocido') }}
+                            </span>
+                        </p>
+                        <p><strong>Notas:</strong> {{ pedido.get('notas', 'Ninguna') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Información de Pago</h6>
+                        <p><strong>Método:</strong> {{ pedido.get('metodo_pago', 'No especificado') }}</p>
+                        <p><strong>Estado:</strong> {{ pedido.get('estado_pago', 'No especificado') }}</p>
+                        <p><strong>Subtotal:</strong> ₡{{ "{:,.0f}".format(pedido.get('subtotal', 0)) }}</p>
+                        <p><strong>Impuestos:</strong> ₡{{ "{:,.0f}".format(pedido.get('impuestos', 0)) }}</p>
+                        <p><strong>Total:</strong> ₡{{ "{:,.0f}".format(pedido.get('total', 0)) }}</p>
+                    </div>
+                </div>
+
+                <h6>Items del Pedido</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in pedido.get('items', []) %}
+                            <tr>
+                                <td>{{ item.get('nombre', 'Producto no disponible') }}</td>
+                                <td>{{ item.get('cantidad', 0) }}</td>
+                                <td>₡{{ "{:,.0f}".format(item.get('precio_unitario', 0)) }}</td>
+                                <td>₡{{ "{:,.0f}".format(item.get('subtotal', 0)) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                {% if pedido.get('estado') == 'Pendiente' %}
+                <form action="{{ url_for('cancelar_pedido', id=pedido['_id']) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('¿Está seguro que desea cancelar este pedido?');">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

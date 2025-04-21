@@ -1,318 +1,64 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Inicio - Restaurante La Duquesa</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --amarillo: #FCD116;
-            --azul: #003893;
-            --rojo: #CE1126;
-            --verde: #2D572C;
-        }
-        
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
-            background-image: linear-gradient(to bottom, rgba(0, 56, 147, 0.1), rgba(206, 17, 38, 0.1));
-        }
+{% extends "base.html" %}
 
-        .main-container {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-top: 30px;
-            margin-bottom: 30px;
-        }
+{% block title %}Inicio - Restaurante La Duquesa{% endblock %}
 
-        .header {
-            background: linear-gradient(135deg, var(--azul), var(--verde));
-            color: white;
-            padding: 30px 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+{% block content %}
+<section class="hero-section mb-5" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/static/images/restaurante2.jpg'); background-size: cover; background-position: center; height: 60vh; display: flex; align-items: center;">
+    <div class="container text-center text-white">
+        <h1 class="display-3 fw-bold mb-4">Bienvenido a La Duquesa</h1>
+        <p class="lead mb-5">Sabores tradicionales con un toque moderno</p>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('registro') }}" class="btn btn-warning btn-lg px-4 me-2">Regístrate</a>
+        <a href="{{ url_for('menu') }}" class="btn btn-outline-light btn-lg px-4">Ver Menú</a>
+        {% else %}
+        <a href="{{ url_for('realizar_pedido') }}" class="btn btn-warning btn-lg px-4 me-2">Realizar Pedido</a>
+        <a href="{{ url_for('menu') }}" class="btn btn-outline-light btn-lg px-4">Ver Menú Completo</a>
+        {% endif %}
+    </div>
+</section>
 
-        .header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 L0,100 Z" fill="none" stroke="%23FCD116" stroke-width="2" stroke-dasharray="5,5"/></svg>');
-            opacity: 0.2;
-        }
-
-        .logo {
-            font-family: 'Georgia', serif;
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-
-        .btn-menu {
-            border-radius: 50px;
-            padding: 12px 25px;
-            font-weight: 600;
-            margin: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 220px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-menu:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-menu::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0));
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .btn-menu:hover::after {
-            opacity: 1;
-        }
-
-        .platos-container {
-            padding: 30px;
-            background-color: white;
-        }
-
-        .plato-card {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            margin-bottom: 20px;
-            border: none;
-        }
-
-        .plato-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .plato-img {
-            height: 180px;
-            object-fit: cover;
-            width: 100%;
-        }
-
-        .plato-name {
-            font-weight: bold;
-            color: var(--azul);
-            margin-top: 10px;
-        }
-
-        .footer {
-            background-color: var(--verde);
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .btn-empleados { background-color: var(--azul); color: white; border: 2px solid var(--azul); }
-        .btn-clientes { background-color: var(--rojo); color: white; border: 2px solid var(--rojo); }
-        .btn-bebidas { background-color: #6c757d; color: white; border: 2px solid #6c757d; }
-        .btn-platos { background-color: var(--verde); color: white; border: 2px solid var(--verde); }
-        .btn-proveedores { background-color: #fd7e14; color: white; border: 2px solid #fd7e14; }
-        .btn-pedidos { background-color: #dc3545; color: white; border: 2px solid #dc3545; }
-        .btn-inventario { background-color: #343a40; color: white; border: 2px solid #343a40; }
-        .btn-reservaciones { background-color: #17a2b8; color: white; border: 2px solid #17a2b8; }
-        .btn-pagos {background-color: #9c27b0; color: white; border: 2px solid #9c27b0; }
-        .btn-mesas {background-color: #795548; color: white; border: 2px solid #795548; }
-
-
-        .section-title {
-            color: var(--azul);
-            font-weight: bold;
-            margin-bottom: 20px;
-            position: relative;
-            display: inline-block;
-        }
-
-        .section-title::after {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background-color: var(--amarillo);
-        }
-    </style>
-</head>
-<body>
+<section class="mb-5">
     <div class="container">
-        <div class="main-container">
-            <div class="header">
-                <div class="logo">Restaurante La Duquesa</div>
-                <div class="subtitle">Sistema de Gestión Interna</div>
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8 text-center">
+                <h2 class="fw-bold mb-3">Nuestros Platos Destacados</h2>
+                <p class="lead text-muted">Descubre los favoritos de nuestros clientes</p>
             </div>
-
-            <div class="platos-container text-center">
-                <h3 class="section-title">Módulos de Gestión</h3>
-                <p>Seleccione el área que desea administrar:</p>
-                
-                <div class="row justify-content-center">
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='empleados') }}" class="btn btn-menu btn-empleados">
-                            <i class="fas fa-users me-2"></i>Empleados
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='clientes') }}" class="btn btn-menu btn-clientes">
-                            <i class="fas fa-user-tie me-2"></i>Clientes
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='bebidas') }}" class="btn btn-menu btn-bebidas">
-                            <i class="fas fa-glass-whiskey me-2"></i>Bebidas
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='platos') }}" class="btn btn-menu btn-platos">
-                            <i class="fas fa-utensils me-2"></i>Platos
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='proveedores') }}" class="btn btn-menu btn-proveedores">
-                            <i class="fas fa-truck me-2"></i>Proveedores
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='pedidos') }}" class="btn btn-menu btn-pedidos">
-                            <i class="fas fa-clipboard-list me-2"></i>Pedidos
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='inventario') }}" class="btn btn-menu btn-inventario">
-                            <i class="fas fa-boxes me-2"></i>Inventario
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='reservaciones') }}" class="btn btn-menu btn-reservaciones">
-                            <i class="fas fa-calendar-alt me-2"></i>Reservaciones
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='pagos') }}" class="btn btn-menu btn-pagos">
-                            <i class="fas fa-credit-card me-2"></i>Pagos
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-lg-3">
-                        <a href="{{ url_for('index', collection='mesas') }}" class="btn btn-menu btn-mesas">
-                            <i class="fas fa-chair me-2"></i>Mesas
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="platos-container">
-                <h3 class="section-title">Nuestros Platos Destacados</h3>
-                <div class="row">
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/chuzos_pollo.jpg" alt="Chuzos de pollo" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Chuzos de Pollo</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/bandeja_paisa.jpg" alt="Bandeja paisa" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Bandeja Paisa</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/sancocho.jpg" alt="Sancocho" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Sancocho</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/sopa_mondongo.jpg" alt="Sopa de mondongo" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Sopa de Mondongo</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/sudado_costilla.jpg" alt="Sudado de costilla" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Sudado de Costilla</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/hamburguesa.jpg" alt="Hamburguesa La Duquesa" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Hamburguesa La Duquesa</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/arepa.jpg" alt="Arepa La Duquesa" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Arepa La Duquesa</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/mandiduquesa.jpg" alt="Mandiduquesa" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Mandiduquesa</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="plato-card">
-                            <img src="/static/images/happy_kids.jpg" alt="Happy Kids" class="plato-img">
-                            <div class="p-3">
-                                <div class="plato-name">Happy Kids</div>
-                            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for plato in platos_destacados %}
+            <div class="col-md-4 col-sm-6">
+                <div class="card card-producto h-100">
+                    <img src="{{ url_for('static', filename='images/' + plato.imagen) }}" class="card-img-top producto-img" alt="{{ plato.nombre }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ plato.nombre }}</h5>
+                        <p class="card-text text-muted">{{ plato.descripcion|truncate(100) }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success">₡{{ "{:,.0f}".format(plato.precio) }}</span>
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('realizar_pedido') }}" class="btn btn-sm btn-outline-primary">Pedir ahora</a>
+                            {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-primary">Inicia sesión para pedir</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
-            <div class="footer">
-                <p>© 2025 Restaurante La Duquesa - Todos los derechos reservados</p>
-                <p class="mb-0">Sistema de Gestión Interna - Versión 1.0</p>
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="fw-bold mb-4">Sobre Nosotros</h2>
+                <p class="lead">En La Duquesa, nos enorgullecemos de ofrecer una experiencia culinaria única que combina lo mejor de la cocina tradicional con un toque moderno.</p>
+                <p>Nuestros chefs utilizan ingredientes frescos y locales para crear platos que deleitan los sentidos y crean momentos memorables.</p>
             </div>
         </div>
     </div>
-</body>
-</html>
+</section>
+{% endblock %}

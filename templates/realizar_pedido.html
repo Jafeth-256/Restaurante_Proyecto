@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Realizar Pedido - Restaurante La Duquesa{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="fw-bold">Realizar Pedido</h1>
+        <p class="text-muted">Selecciona los productos que deseas ordenar</p>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form id="pedidoForm" method="POST" action="{{ url_for('realizar_pedido') }}">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <ul class="nav nav-tabs" id="productoTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="platos-tab" data-bs-toggle="tab" data-bs-target="#platos" type="button">Platos</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="bebidas-tab" data-bs-toggle="tab" data-bs-target="#bebidas" type="button">Bebidas</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content py-3" id="productoTabsContent">
+                        <div class="tab-pane fade show active" id="platos" role="tabpanel">
+                            <div class="row g-3">
+                                {% for plato in platos %}
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="row g-0">
+                                            <div class="col-md-4">
+                                                <img src="{{ url_for('static', filename='images/' + plato.imagen) }}" class="card-img-top producto-img" alt="{{ plato.nombre }}">                    
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ plato.nombre }}</h5>
+                                                    <p class="card-text text-muted small">{{ plato.descripcion|truncate(80) }}</p>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="fw-bold text-success">₡{{ "{:,.0f}".format(plato.precio) }}</span>
+                                                        <div class="input-group" style="width: 120px;">
+                                                            <input type="hidden" name="items[]" value="{{ plato._id }}">
+                                                            <input type="number" name="cantidades[]" class="form-control form-control-sm" min="0" value="0" data-precio="{{ plato.precio }}">
+                                                            <span class="input-group-text">uds</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="bebidas" role="tabpanel">
+                            <div class="row g-3">
+                                {% for bebida in bebidas %}
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="row g-0">
+                                            <div class="col-md-4">
+                                                <img src="{{ url_for('static', filename='images/' + bebida.imagen) }}" class="card-img-top producto-img" alt="{{ bebida.nombre }}">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ bebida.nombre }}</h5>
+                                                    <p class="card-text text-muted small">{{ bebida.descripcion }}</p>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="fw-bold text-success">₡{{ "{:,.0f}".format(bebida.precio) }}</span>
+                                                        <div class="input-group" style="width: 120px;">
+                                                            <input type="hidden" name="items[]" value="{{ bebida._id }}">
+                                                            <input type="number" name="cantidades[]" class="form-control form-control-sm" min="0" value="0" data-precio="{{ bebida.precio }}">
+                                                            <span class="input-group-text">uds</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Resumen del Pedido</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="resumenItems" class="mb-3">
+                                <p class="text-muted small">Agrega productos a tu pedido</p>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">₡0</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Impuestos (13%):</span>
+                                <span id="impuestos">₡0</span>
+                            </div>
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total:</span>
+                                <span id="total">₡0</span>
+                            </div>
+                            <hr>
+                            <div class="mb-3">
+                                <label for="notas" class="form-label">Notas adicionales:</label>
+                                <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Método de Pago:</label>
+                                <select class="form-select" name="metodo_pago" required>
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Tarjeta de crédito">Tarjeta de crédito</option>
+                                    <option value="Tarjeta de débito">Tarjeta de débito</option>
+                                    <option value="PayPal">PayPal</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-check-circle me-2"></i>Confirmar Pedido
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const resumenContainer = document.getElementById('resumenItems');
+    const subtotalElement = document.getElementById('subtotal');
+    const impuestosElement = document.getElementById('impuestos');
+    const totalElement = document.getElementById('total');
+    const form = document.getElementById('pedidoForm');
+    
+    const productosSeleccionados = {};
+    
+    function inicializarInputs() {
+        document.querySelectorAll('input[name="cantidades[]"]').forEach(input => {
+            const productoId = input.previousElementSibling.value;
+            const card = input.closest('.card');
+            const nombre = card.querySelector('.card-title').textContent.trim();
+            // Los precios ya incluyen impuestos (13% incluido)
+            const precioConImpuestos = parseFloat(input.dataset.precio);
+            
+            productosSeleccionados[productoId] = {
+                nombre: nombre,
+                precio: precioConImpuestos,
+                cantidad: 0,
+                input: input,
+                hiddenInput: input.previousElementSibling
+            };
+            
+            input.addEventListener('input', actualizarResumen);
+            input.addEventListener('change', actualizarResumen);
+        });
+    }
+    
+    function actualizarResumen() {
+        let subtotal = 0;
+        let html = '';
+        
+        // Calcular subtotal (precios ya incluyen impuestos)
+        for (const id in productosSeleccionados) {
+            const producto = productosSeleccionados[id];
+            const cantidad = parseInt(producto.input.value) || 0;
+            producto.cantidad = cantidad;
+            
+            if (cantidad > 0) {
+                const totalProducto = producto.precio * cantidad;
+                subtotal += totalProducto;
+                
+                html += `
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span>${producto.nombre} (x${cantidad})</span>
+                        <span>₡${totalProducto.toLocaleString('es-CR')}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        resumenContainer.innerHTML = html || '<p class="text-muted small">Agrega productos a tu pedido</p>';
+        
+        const impuestosIncluidos = subtotal * (13 / 113); 
+        const subtotalSinImpuestos = subtotal - impuestosIncluidos;
+        
+        subtotalElement.textContent = `₡${subtotalSinImpuestos.toFixed(2)}`;
+        impuestosElement.textContent = `₡${impuestosIncluidos.toFixed(2)}`;
+        totalElement.textContent = `₡${subtotal.toLocaleString('es-CR')}`;
+    }
+    
+    form.addEventListener('submit', function(e) {
+        let hasItems = false;
+        
+        for (const id in productosSeleccionados) {
+            const producto = productosSeleccionados[id];
+            if (producto.cantidad > 0) {
+                hasItems = true;
+                producto.input.value = producto.cantidad;
+                producto.hiddenInput.value = id;
+            } else {
+                producto.input.value = 0;
+            }
+        }
+        
+        if (!hasItems) {
+            e.preventDefault();
+            alert('Debe seleccionar al menos un producto para realizar el pedido.');
+        }
+    });
+    
+    inicializarInputs();
+    actualizarResumen();
+});
+</script>
+{% endblock %}
